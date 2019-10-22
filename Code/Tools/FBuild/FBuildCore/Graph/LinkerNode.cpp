@@ -492,7 +492,7 @@ bool LinkerNode::BuildArgs( Args & fullArgs ) const
     }
 
     // orbis-ld.exe requires escaped slashes inside response file
-    if ( GetFlag( LINK_FLAG_ORBIS_LD ) )
+    if ( GetFlag( LINK_FLAG_ORBIS_LD ) || GetFlag( LINK_FLAG_CLANG ) )
     {
         fullArgs.SetEscapeSlashesInResponseFile();
     }
@@ -645,6 +645,11 @@ void LinkerNode::GetAssemblyResourceFiles( Args & fullArgs, const AString & pre,
         {
             flags |= LinkerNode::LINK_FLAG_CODEWARRIOR_LD;
         }
+		else if ((linkerName.EndsWithI("clang++.exe")) ||
+			(linkerName.EndsWithI("clang++")))
+		{
+			flags |= LinkerNode::LINK_FLAG_CLANG;
+		}
     }
     else
     {
@@ -672,7 +677,11 @@ void LinkerNode::GetAssemblyResourceFiles( Args & fullArgs, const AString & pre,
         {
             flags |= LinkerNode::LINK_FLAG_CODEWARRIOR_LD;
         }
-    }
+		else if (linkerType == "clang")
+		{
+			flags |= LinkerNode::LINK_FLAG_CLANG;
+		}
+	}
 
     return flags;
 }
@@ -914,7 +923,7 @@ void LinkerNode::EmitStampMessage() const
 bool LinkerNode::CanUseResponseFile() const
 {
     #if defined( __WINDOWS__ )
-        return ( GetFlag( LINK_FLAG_MSVC ) || GetFlag( LINK_FLAG_GCC ) || GetFlag( LINK_FLAG_SNC ) || GetFlag( LINK_FLAG_ORBIS_LD ) || GetFlag( LINK_FLAG_GREENHILLS_ELXR ) || GetFlag( LINK_FLAG_CODEWARRIOR_LD ) );
+        return (GetFlag(LINK_FLAG_CLANG) || GetFlag( LINK_FLAG_MSVC ) || GetFlag( LINK_FLAG_GCC ) || GetFlag( LINK_FLAG_SNC ) || GetFlag( LINK_FLAG_ORBIS_LD ) || GetFlag( LINK_FLAG_GREENHILLS_ELXR ) || GetFlag( LINK_FLAG_CODEWARRIOR_LD ) );
     #else
         return false;
     #endif

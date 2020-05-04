@@ -118,7 +118,7 @@ LinkerNode::LinkerNode()
 
     // get inputs not passed through 'LibraryNodes' (i.e. directly specified on the cmd line)
     Dependencies otherLibraryNodes( 64, true );
-    if ( ( m_Flags & ( LinkerNode::LINK_FLAG_MSVC | LinkerNode::LINK_FLAG_GCC | LinkerNode::LINK_FLAG_SNC | LinkerNode::LINK_FLAG_ORBIS_LD | LinkerNode::LINK_FLAG_GREENHILLS_ELXR | LinkerNode::LINK_FLAG_CODEWARRIOR_LD ) ) != 0 )
+    if ( ( m_Flags & ( LinkerNode::LINK_FLAG_MSVC | LinkerNode::LINK_FLAG_GCC | LinkerNode::LINK_FLAG_SNC | LinkerNode::LINK_FLAG_ORBIS_LD | LinkerNode::LINK_FLAG_GREENHILLS_ELXR | LinkerNode::LINK_FLAG_CODEWARRIOR_LD | LinkerNode::LINK_FLAG_NX_LD ) ) != 0 )
     {
         const bool msvcStyle = ( ( m_Flags & LinkerNode::LINK_FLAG_MSVC ) == LinkerNode::LINK_FLAG_MSVC );
         if ( !GetOtherLibraries( nodeGraph, iter, function, m_LinkerOptions, otherLibraryNodes, msvcStyle ) )
@@ -506,7 +506,7 @@ bool LinkerNode::BuildArgs( Args & fullArgs ) const
     }
 
     // orbis-ld.exe requires escaped slashes inside response file
-    if ( GetFlag( LINK_FLAG_ORBIS_LD ) || GetFlag( LINK_FLAG_CLANG ) )
+    if ( GetFlag( LINK_FLAG_ORBIS_LD ) || GetFlag( LINK_FLAG_NX_LD ) )
     {
         fullArgs.SetEscapeSlashesInResponseFile();
     }
@@ -659,11 +659,11 @@ void LinkerNode::GetAssemblyResourceFiles( Args & fullArgs, const AString & pre,
         {
             flags |= LinkerNode::LINK_FLAG_CODEWARRIOR_LD;
         }
-		else if ((linkerName.EndsWithI("clang++.exe")) ||
-			(linkerName.EndsWithI("clang++")))
-		{
-			flags |= LinkerNode::LINK_FLAG_CLANG;
-		}
+        else if ( ( linkerName.EndsWithI( "nx-clang++.exe" ) ) ||
+            ( linkerName.EndsWithI( "nx-clang++" ) ) )
+        {
+            flags |= LinkerNode::LINK_FLAG_NX_LD;
+        }
     }
     else
     {
@@ -691,10 +691,10 @@ void LinkerNode::GetAssemblyResourceFiles( Args & fullArgs, const AString & pre,
         {
             flags |= LinkerNode::LINK_FLAG_CODEWARRIOR_LD;
         }
-		else if (linkerType == "clang")
-		{
-			flags |= LinkerNode::LINK_FLAG_CLANG;
-		}
+		else if (linkerType == "nx-clang")
+        {
+            flags |= LinkerNode::LINK_FLAG_NX_LD;
+        }
 	}
 
     return flags;
@@ -943,7 +943,7 @@ void LinkerNode::EmitStampMessage() const
 bool LinkerNode::CanUseResponseFile() const
 {
     #if defined( __WINDOWS__ )
-        return (GetFlag(LINK_FLAG_CLANG) || GetFlag( LINK_FLAG_MSVC ) || GetFlag( LINK_FLAG_GCC ) || GetFlag( LINK_FLAG_SNC ) || GetFlag( LINK_FLAG_ORBIS_LD ) || GetFlag( LINK_FLAG_GREENHILLS_ELXR ) || GetFlag( LINK_FLAG_CODEWARRIOR_LD ) );
+        return ( GetFlag( LINK_FLAG_MSVC ) || GetFlag( LINK_FLAG_GCC ) || GetFlag( LINK_FLAG_SNC ) || GetFlag( LINK_FLAG_ORBIS_LD ) || GetFlag( LINK_FLAG_GREENHILLS_ELXR ) || GetFlag( LINK_FLAG_CODEWARRIOR_LD ) || GetFlag(LINK_FLAG_NX_LD) );
     #else
         return false;
     #endif

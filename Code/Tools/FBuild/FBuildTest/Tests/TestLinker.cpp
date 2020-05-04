@@ -332,6 +332,7 @@ void TestLinker::LinkerType() const
     TEST_LINKERTYPE( "orbis-ld",    LinkerNode::LINK_FLAG_ORBIS_LD );
     TEST_LINKERTYPE( "elxr",        LinkerNode::LINK_FLAG_GREENHILLS_ELXR );
     TEST_LINKERTYPE( "mwldeppc",    LinkerNode::LINK_FLAG_CODEWARRIOR_LD );
+    TEST_LINKERTYPE( "nx-clang",    LinkerNode::LINK_FLAG_CLANG_LD );
 
     #undef TEST_LINKERTYPE
 }
